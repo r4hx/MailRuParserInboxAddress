@@ -62,7 +62,7 @@ def CheckMail(EMAIL, PASSWORD):
     unique_list = UniqueList(email_list)
     result_list = CheckBadWords(unique_list)
 
-    with open("{}.txt".format(EMAIL), 'w', encoding='utf-8') as f:
+    with open("result/{}.txt".format(EMAIL), 'w', encoding='utf-8') as f:
         for i in result_list:
             f.write(i + '\n')
     root.title("Результат в папке с программой".format(EMAIL))
