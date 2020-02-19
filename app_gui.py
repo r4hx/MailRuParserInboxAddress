@@ -1,47 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from tkinter import *
-from tkinter.ttk import *
-import email
-import imaplib
+import tkinter
+import tkinter.ttk
 
-BADWORDS = [words.strip() for words in open('badwords.txt').readlines()]
-
-
-def UniqueList(LIST):
-    seen = set()
-    result = []
-    for mail in LIST:
-        if mail in seen:
-            continue
-        seen.add(mail)
-        result.append(mail)
-    LIST = result
-    return LIST
-
-
-def CheckBadWords(LIST):
-    bad_list = []
-    for mail in LIST:
-        for word in BADWORDS:
-            if word in mail:
-                bad_list.append(mail)
-                break
-    for bad in bad_list:
-        LIST.remove(bad)
-    return LIST
+import function
 
 
 def CheckMail(EMAIL, PASSWORD):
     try:
-        mail = imaplib.IMAP4_SSL('imap.mail.ru')
-        mail.login(EMAIL, PASSWORD)
-        mail.select("Inbox")
-    except (imaplib.IMAP4.error):
+        connect = function.mail_connection()
+    except:
+        root.title("Нет подключения к серверу IMAP")
+        raise ConnectionError("Нет подключения к серверу IMAP")
+    try:
+        connect = function.mail_auth(connect, EMAIL, PASSWORD)
+    except:
         root.title("Неправильный email/пароль")
-
-    result, data = mail.uid('search', None, "ALL")
-    email_uid_list = data[0].split()
+        raise ConnectionError("Неправильный email/пароль")
+    email_uid_list = function.mail_fetch_all_uid(connect)
     email_list = []
     counter = 0
     maximum = len(email_uid_list)
@@ -49,18 +25,15 @@ def CheckMail(EMAIL, PASSWORD):
     for i in email_uid_list:
         try:
             counter += 1
-            result, data = mail.uid('fetch', i, '(RFC822)')
-            raw_email = data[0][1]
-            email_message = email.message_from_bytes(raw_email)
-            email_list.append(email.utils.parseaddr(email_message['From'])[1])
+            email_list.append(function.mail_parseaddr(connect, i))
             pbar1["value"] = counter
             root.title("Проверенно: {} из {}".format(counter, maximum))
             root.update()
         except:
             pass
 
-    unique_list = UniqueList(email_list)
-    result_list = CheckBadWords(unique_list)
+    unique_list = function.UniqueList(email_list)
+    result_list = function.CheckBadWords(unique_list)
 
     with open("result/{}.txt".format(EMAIL), 'w', encoding='utf-8') as f:
         for i in result_list:
@@ -76,20 +49,21 @@ def btn1_click():
     password = ent2.get()
     CheckMail(email, password)
 
-root = Tk()
+
+root = tkinter.Tk()
 root.title("email address parser")
 root.geometry("400x150")
 root.resizable(width=False, height=False)
-lbl1 = Label(text="Ваш email")
+lbl1 = tkinter.Label(text="Ваш email")
 lbl1.pack()
-ent1 = Entry()
+ent1 = tkinter.Entry()
 ent1.pack()
-lbl2 = Label(text="Ваш пароль")
+lbl2 = tkinter.Label(text="Ваш пароль")
 lbl2.pack()
-ent2 = Entry(show="*")
+ent2 = tkinter.Entry(show="*")
 ent2.pack()
-pbar1 = Progressbar(orient="horizontal", mode="determinate", length=200)
+pbar1 = tkinter.ttk.Progressbar(orient="horizontal", mode="determinate", length=200)
 pbar1.pack()
-btn1 = Button(text="Начать", command=btn1_click)
+btn1 = tkinter.Button(text="Начать", command=btn1_click)
 btn1.pack()
 root.mainloop()
