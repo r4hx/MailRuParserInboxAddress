@@ -32,8 +32,8 @@ def CheckMail(EMAIL, PASSWORD):
         except:
             pass
 
-    unique_list = function.UniqueList(email_list)
-    result_list = function.CheckBadWords(unique_list)
+    unique_list = function.uniquelist(email_list)
+    result_list = function.checkbadwords(unique_list)
 
     with open("result/{}.txt".format(EMAIL), 'w', encoding='utf-8') as f:
         for i in result_list:

@@ -30,13 +30,13 @@ class TestDirectoryResult(unittest.TestCase):
 class TestRunFunction(unittest.TestCase):
     def test_unique_list_function(self):
         self.test_list = ['one', 'two', 'five', 'six', 'one', 'six']
-        self.result_address_list = function.UniqueList(self.test_list)
+        self.result_address_list = function.uniquelist(self.test_list)
         self.assertTrue(len(self.result_address_list) == 4)
 
     def test_check_badwords_function(self):
         self.test_address_list = ['robot@yandex.ru', 'test@mail.ru', 'admin@vk.com', 'raduga@mail.ru', 'no-reply@gmail.com']
         self.len_test_address_list = len(self.test_address_list)
-        self.test_address_list = function.CheckBadWords(self.test_address_list)
+        self.test_address_list = function.checkbadwords(self.test_address_list)
         self.assertNotEqual(self.len_test_address_list, len(self.test_address_list))
 
 
